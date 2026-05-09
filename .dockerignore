@@ -1,0 +1,5 @@
+# Build context only needs the Dockerfile; everything else is cloned
+# inside the build via git. Keep the context tiny so `docker build`
+# doesn't waste time uploading unrelated files.
+*
+!Dockerfile

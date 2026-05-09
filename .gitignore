@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# Local Claude Code workspace state
+.claude/
+
+# Local compose overrides
+.env
+docker-compose.override.yml

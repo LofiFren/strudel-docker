@@ -1,0 +1,37 @@
+# Run with:
+#   docker compose up -d --build
+#   open http://localhost:4321
+#
+# Requires Docker Desktop 4.x+ (Mac/Windows) or Docker Engine 23+ (Linux).
+# Both ship Compose v2 + BuildKit by default, which the Dockerfile relies
+# on for `--mount=type=cache`.
+#
+# Override at runtime via env vars or a .env file:
+#   STRUDEL_REF=main         # tag, branch, or commit to build
+#   HOST_PORT=4321           # host port to publish to
+#   BIND_ADDR=127.0.0.1      # set to 0.0.0.0 to expose on the LAN
+
+name: strudel-docker
+
+services:
+  strudel:
+    build:
+      context: .
+      args:
+        STRUDEL_REF: ${STRUDEL_REF:-main}
+    image: strudel:${STRUDEL_REF:-main}
+    container_name: strudel
+    # `init` runs tini as PID 1 so SIGTERM reaches astro/node cleanly on
+    # `docker compose down` (otherwise shutdown waits the full 10s grace
+    # period before the kernel kills it).
+    init: true
+    stop_grace_period: 10s
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:${HOST_PORT:-4321}:4321"
+    restart: unless-stopped
+    # Strudel is a static site at runtime; no writable state needed.
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
