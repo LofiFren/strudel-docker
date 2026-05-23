@@ -1,0 +1,45 @@
+// Example from @LofiFren
+
+setcpm(36) // slow, breath-paced
+$chords: chord("<C^7 G^7 Am9 Fmaj9>/2")
+  .voicing()
+  .s("piano1")
+  .attack(0.005) // tiny attack ramp prevents zero-crossing pop on trigger
+  .room(0.9).roomsize(0.85)
+  .gain(0.28)
+  .pan(sine.range(0.4, 0.6).slow(19))
+
+// --- Bass: chord roots, one octave low. Same deal — no release.
+$bass: note("<C2 G2 A2 F2>/2")
+  .s("piano1")
+  .attack(0.005)
+  .room(0.7)
+  .gain(0.36)
+
+// --- Melody from C major pentatonic. Sparse rests via struct.
+$melody: n(choose(0, 1, 2, 4, 5, 7, 9))
+  .scale("C:pentatonic")
+  .add(choose(0, 0, 0, 0, 12, 12, -12))
+  .s("piano1")
+  .attack(0.005)
+  .struct("1? ~ 1? ~ 1 ~ 1? ~")
+  .room(0.92).roomsize(0.9)
+  .delay(0.35).delaytime(0.5).delayfeedback(0.22) // lower fb so echoes don't stack into clipping
+  .pan(rand.range(0.3, 0.7))
+  .gain(0.34)
+  .cutoff(slider(377.5, 100, 900))
+  ._spectrum()
+
+
+// --- Counter-melody sparkle — rare high notes.
+$sparkle: n(choose(7, 9, 11, 14, 16))
+  .scale("C:pentatonic")
+  .add(12)
+  .s("fmpiano")
+  .attack(0.005)
+  .struct("~ ~ ~ ~ ~ ~ 1? ~")
+  .room(0.97)
+  .delay(0.5).delaytime(0.66).delayfeedback(0.28)
+  .pan(rand.range(0.2, 0.8))
+  .gain(0.24)._scope()
+all(x => x.compressor("-18:3:0.005:0.25"))
